@@ -16,8 +16,9 @@ public class Grid : MonoBehaviour
     private List<Cell> cells = new List<Cell>();
     private Cell[,] grid;
 
-    private int startCellIndex;
-    private int endCellIndex;
+    private Vector2Int startCellIndex;
+    private Vector2Int endCellIndex;
+    private List<Vector2Int> wallsIndex = new List<Vector2Int>();
 
     private void Start()
     {
@@ -38,24 +39,44 @@ public class Grid : MonoBehaviour
         }
 
         //Set starting point
-        startCellIndex = Random.Range(0, cells.Count);
-        endCellIndex = Random.Range(0, cells.Count);
+        startCellIndex = new Vector2Int(Random.Range(0, gridSize.x), Random.Range(0, gridSize.y));
+        endCellIndex = new Vector2Int(Random.Range(0, gridSize.x), Random.Range(0, gridSize.y));
 
-        while(endCellIndex == startCellIndex)
-            endCellIndex = Random.Range(0, cells.Count);
+        while (endCellIndex == startCellIndex)
+            endCellIndex = new Vector2Int(Random.Range(0, gridSize.x), Random.Range(0, gridSize.y));
 
-        cells[startCellIndex].setStart();
-        cells[endCellIndex].setEnd();
+        grid[startCellIndex.x,startCellIndex.y].setStart();
+        grid[endCellIndex.x, endCellIndex.y].setEnd();
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             Vector2 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             int x = (int)(worldPosition.x + 0.5f);
             int y = (int)(worldPosition.y + 0.5f);
-            grid[x, y].setWall();
+
+            if (
+                x < 0 || 
+                y < 0 || 
+                x >= gridSize.x || 
+                y >= gridSize.y ||
+                grid[x,y].cellState == Cell.CellState.START ||
+                grid[x, y].cellState == Cell.CellState.END
+                )
+                return;
+
+            
+
+            if(grid[x, y].setWall())
+            {
+                wallsIndex.Add(new Vector2Int(x, y));
+            }
+        }
+        else if (Input.GetMouseButtonDown(1))
+        {
+            StartCoroutine(PathFinding.instance.init(grid, gridSize, startCellIndex, endCellIndex));
         }
     }
 }

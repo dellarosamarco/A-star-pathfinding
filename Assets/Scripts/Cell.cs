@@ -2,9 +2,25 @@ using UnityEngine;
 
 public class Cell
 {
-    private int x;
-    private int y;
+    public int x;
+    public int y;
+    private Vector2Int pos;
     private GameObject cell;
+    private float gCost;
+    private float fCost;
+    public float hCost;
+
+    public bool focused = false;
+
+    public CellState cellState;
+    public enum CellState
+    {
+        EMPTY,
+        START,
+        END,
+        WALL,
+        WALKED
+    }
 
     public Cell(int x, int y, GameObject cell)
     {
@@ -12,26 +28,52 @@ public class Cell
         this.y = y;
         this.cell = cell;
 
+        pos = new Vector2Int(x, y);
+
         spawnCell();
     }
 
     private void spawnCell()
     {
         cell = GameObject.Instantiate(cell, new Vector2(x, y), Quaternion.identity);
+        cellState = CellState.EMPTY;
     }
 
     public void setStart()
     {
         cell.GetComponent<SpriteRenderer>().color = Static.startColor;
+        cellState = CellState.START;
     }
 
     public void setEnd()
     {
         cell.GetComponent<SpriteRenderer>().color = Static.endColor;
+        cellState = CellState.END;
     }
 
-    public void setWall()
+    public bool setWall()
     {
+        if (cellState == CellState.WALL) return false;
+
         cell.GetComponent<SpriteRenderer>().color = Static.wallColor;
+        cellState = CellState.WALL;
+
+        return true;
+    }
+
+    public void setFocus(Vector2Int startCell, Vector2Int endCell)
+    {
+        cell.GetComponent<SpriteRenderer>().color = Static.focusColor;
+        focused = true;
+
+        gCost = Vector2.Distance(startCell, pos);
+        fCost = Vector2.Distance(endCell, pos);
+        hCost = gCost + fCost;
+    }
+
+    public void setWalked()
+    {
+        cell.GetComponent<SpriteRenderer>().color = Static.walkedColor;
+        cellState = CellState.WALKED;
     }
 }
