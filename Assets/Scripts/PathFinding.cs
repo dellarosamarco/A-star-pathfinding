@@ -5,7 +5,6 @@ using UnityEngine;
 public class PathFinding : MonoBehaviour
 {
     public static PathFinding instance;
-    private Cell lastCell = null;
 
     private void Awake()
     {
@@ -14,17 +13,12 @@ public class PathFinding : MonoBehaviour
 
     public IEnumerator init(Cell[,] grid, Vector2Int gridSize, Vector2Int startCell, Vector2Int endCell)
     {
-        Cell currentCell = null;
-        Cell bestCell = null;
-        float bestHCost = 0;
-        while(lastCell != grid[endCell.x, endCell.y]){
-            int counter = 0;
+        Cell currentCell = grid[startCell.x, startCell.y];
+        Cell targetCell = grid[endCell.x, endCell.y];
+        List<Cell> focusedCells = new List<Cell>();
 
-            if (lastCell == null)
-                currentCell = grid[startCell.x, startCell.y];
-            else
-                currentCell = lastCell;
-
+        while(currentCell != targetCell)
+        {
             for (int x = -1 + currentCell.x; x < 2 + currentCell.x; x++)
             {
                 for (int y = -1 + currentCell.y; y < 2 + currentCell.y; y++)
@@ -35,50 +29,35 @@ public class PathFinding : MonoBehaviour
                         (x >= 0 && x < gridSize.x) &&
                         (y >= 0 && y < gridSize.y) &&
                         (grid[x, y].cellState != Cell.CellState.WALKED) &&
-                        (grid[x, y].cellState != Cell.CellState.WALL))
+                        (grid[x, y].cellState != Cell.CellState.WALL) &&
+                        (grid[x, y].focused == false))
                     {
                         grid[x, y].setFocus(startCell, endCell);
-                        
-                        if(counter == 0){
-                            bestHCost = grid[x, y].hCost;
-                        }
-
-                        if (grid[x, y].hCost <= bestHCost)
-                        {
-                            bestHCost = grid[x, y].hCost;
-                            bestCell = grid[x, y];
-                        }
-
-                        counter ++;
+                        focusedCells.Add(grid[x, y]);
                     }
                 }
             }
 
-            for (int x = 0; x < gridSize.x; x++)
+            Cell bestFocusedCell = focusedCells[0];
+            foreach (Cell cell in focusedCells)
             {
-                for (int y = 0; y < gridSize.y; y++)
+                if (cell.fCost < bestFocusedCell.fCost)
                 {
-                    if(grid[x, y].focused)
-                    {
-                        if(
-                           (grid[x, y].cellState != Cell.CellState.WALKED) &&
-                           (grid[x, y].cellState != Cell.CellState.WALL)
-                           )
-                        {
-                            if (grid[x, y].hCost < bestHCost)
-                            {
-                                bestHCost = grid[x, y].hCost;
-                                bestCell = grid[x, y];
-                            }
-                        }
-                    }
+                    bestFocusedCell = cell;
+                    break;
+                }
+                else if(cell.fCost == bestFocusedCell.fCost)
+                {
+                    bestFocusedCell = cell;
                 }
             }
+            focusedCells.Remove(bestFocusedCell);
+            currentCell = bestFocusedCell;
+            bestFocusedCell.setWalked();
 
-            bestCell.setWalked();
-            lastCell = bestCell;
-
-            yield return new WaitForSeconds(0.05f);
+            yield return null;
         }
     }
+
+
 }

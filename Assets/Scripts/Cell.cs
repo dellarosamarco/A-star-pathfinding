@@ -7,8 +7,8 @@ public class Cell
     private Vector2Int pos;
     private GameObject cell;
     private float gCost;
-    private float fCost;
     public float hCost;
+    public float fCost;
 
     public bool focused = false;
 
@@ -67,8 +67,8 @@ public class Cell
         focused = true;
 
         gCost = Vector2.Distance(startCell, pos);
-        fCost = Vector2.Distance(endCell, pos);
-        hCost = gCost + fCost;
+        hCost = Vector2.Distance(endCell, pos);
+        fCost = gCost + hCost;
     }
 
     public void setWalked()
