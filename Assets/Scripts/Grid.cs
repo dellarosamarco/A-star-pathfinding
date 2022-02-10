@@ -20,6 +20,8 @@ public class Grid : MonoBehaviour
     private Vector2Int endCellIndex;
     private List<Vector2Int> wallsIndex = new List<Vector2Int>();
 
+    private bool searchingPath = false;
+
     private void Start()
     {
         cameraTransform.position = new Vector3(gridSize.x / 2, gridSize.y / 2, -10);
@@ -39,13 +41,7 @@ public class Grid : MonoBehaviour
         }
 
         //Set starting point
-        startCellIndex = new Vector2Int(Random.Range(0, gridSize.x), Random.Range(0, gridSize.y));
         endCellIndex = new Vector2Int(Random.Range(0, gridSize.x), Random.Range(0, gridSize.y));
-
-        while (endCellIndex == startCellIndex)
-            endCellIndex = new Vector2Int(Random.Range(0, gridSize.x), Random.Range(0, gridSize.y));
-
-        grid[startCellIndex.x,startCellIndex.y].setStart();
         grid[endCellIndex.x, endCellIndex.y].setEnd();
     }
 
@@ -57,17 +53,9 @@ public class Grid : MonoBehaviour
             int x = (int)(worldPosition.x + 0.5f);
             int y = (int)(worldPosition.y + 0.5f);
 
-            if (
-                x < 0 || 
-                y < 0 || 
-                x >= gridSize.x || 
-                y >= gridSize.y ||
-                grid[x,y].cellState == Cell.CellState.START ||
-                grid[x, y].cellState == Cell.CellState.END
-                )
+            if (x < 0 || y < 0 || x >= gridSize.x || y >= gridSize.y ||
+                grid[x,y].cellState == Cell.CellState.START ||grid[x, y].cellState == Cell.CellState.END)
                 return;
-
-            
 
             if(grid[x, y].setWall())
             {
@@ -76,7 +64,28 @@ public class Grid : MonoBehaviour
         }
         else if (Input.GetMouseButtonDown(1))
         {
-            StartCoroutine(PathFinding.instance.init(grid, gridSize, startCellIndex, endCellIndex));
+            if (searchingPath)
+            {
+                foreach(Cell cell in cells)
+                {
+                    cell.reset();
+                }
+            }
+
+            searchingPath = true;
+
+            Vector2 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            int x = (int)(worldPosition.x + 0.5f);
+            int y = (int)(worldPosition.y + 0.5f);
+
+            if (x < 0 || y < 0 || x >= gridSize.x || y >= gridSize.y || 
+                grid[x, y].cellState == Cell.CellState.END)
+                return;
+
+            grid[x, y].setStart();
+            startCellIndex = new Vector2Int(x, y);
+
+            StartCoroutine(PathFinding.instance.findPath(grid, gridSize, startCellIndex, endCellIndex));
         }
     }
 }

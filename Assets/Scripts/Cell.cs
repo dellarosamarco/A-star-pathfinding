@@ -37,6 +37,7 @@ public class Cell
     {
         cell = GameObject.Instantiate(cell, new Vector2(x, y), Quaternion.identity);
         cellState = CellState.EMPTY;
+        cell.GetComponent<SpriteRenderer>().color = Static.emptyColor;
     }
 
     public void setStart()
@@ -63,7 +64,8 @@ public class Cell
 
     public void setFocus(Vector2Int startCell, Vector2Int endCell)
     {
-        cell.GetComponent<SpriteRenderer>().color = Static.focusColor;
+        if(cellState != CellState.END && cellState != CellState.START)
+            cell.GetComponent<SpriteRenderer>().color = Static.focusColor;
         focused = true;
 
         gCost = Vector2.Distance(startCell, pos);
@@ -73,7 +75,21 @@ public class Cell
 
     public void setWalked()
     {
+        if (cellState == CellState.END || cellState == CellState.START)
+            return;
+
         cell.GetComponent<SpriteRenderer>().color = Static.walkedColor;
         cellState = CellState.WALKED;
+    }
+
+    public void reset()
+    {
+        focused = false;
+
+        if (cellState == CellState.WALL || cellState == CellState.END)
+            return;
+
+        cellState = CellState.EMPTY;
+        cell.GetComponent<SpriteRenderer>().color = Static.emptyColor;
     }
 }

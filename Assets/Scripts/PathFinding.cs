@@ -11,7 +11,7 @@ public class PathFinding : MonoBehaviour
         instance = this;
     }
 
-    public IEnumerator init(Cell[,] grid, Vector2Int gridSize, Vector2Int startCell, Vector2Int endCell)
+    public IEnumerator findPath(Cell[,] grid, Vector2Int gridSize, Vector2Int startCell, Vector2Int endCell)
     {
         Cell currentCell = grid[startCell.x, startCell.y];
         Cell targetCell = grid[endCell.x, endCell.y];
@@ -30,7 +30,8 @@ public class PathFinding : MonoBehaviour
                         (y >= 0 && y < gridSize.y) &&
                         (grid[x, y].cellState != Cell.CellState.WALKED) &&
                         (grid[x, y].cellState != Cell.CellState.WALL) &&
-                        (grid[x, y].focused == false))
+                        (grid[x, y].focused == false)
+                       )
                     {
                         grid[x, y].setFocus(startCell, endCell);
                         focusedCells.Add(grid[x, y]);
@@ -65,11 +66,10 @@ public class PathFinding : MonoBehaviour
             }
             focusedCells.Remove(bestFocusedCell);
             currentCell = bestFocusedCell;
+
             bestFocusedCell.setWalked();
 
             yield return null;
         }
     }
-
-
 }
