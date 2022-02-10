@@ -39,16 +39,28 @@ public class PathFinding : MonoBehaviour
             }
 
             Cell bestFocusedCell = focusedCells[0];
+            int priority = 3;
             foreach (Cell cell in focusedCells)
             {
-                if (cell.fCost < bestFocusedCell.fCost)
+                if(cell.fCost < bestFocusedCell.fCost && cell.hCost < bestFocusedCell.hCost && priority >= 0)
                 {
                     bestFocusedCell = cell;
-                    break;
+                    priority = 0;
                 }
-                else if(cell.fCost == bestFocusedCell.fCost)
+                else if (cell.fCost < bestFocusedCell.fCost && priority >= 1)
                 {
                     bestFocusedCell = cell;
+                    priority = 1;
+                }
+                else if(cell.fCost == bestFocusedCell.fCost && cell.hCost < bestFocusedCell.hCost && priority >= 2)
+                {
+                    bestFocusedCell = cell;
+                    priority = 2;
+                }
+                else if(cell.fCost == bestFocusedCell.fCost && priority >= 3)
+                {
+                    bestFocusedCell = cell;
+                    priority = 3;
                 }
             }
             focusedCells.Remove(bestFocusedCell);
