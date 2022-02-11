@@ -25,7 +25,7 @@ public class Grid : MonoBehaviour
     private void Start()
     {
         cameraTransform.position = new Vector3(gridSize.x / 2, gridSize.y / 2, -10);
-        cameraTransform.gameObject.GetComponent<Camera>().orthographicSize = 15;
+        cameraTransform.gameObject.GetComponent<Camera>().orthographicSize = gridSize.x / 1.666f;
 
         grid = new Cell[gridSize.x, gridSize.y];
 

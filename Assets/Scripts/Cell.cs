@@ -6,11 +6,16 @@ public class Cell
     public int y;
     private Vector2Int pos;
     private GameObject cell;
-    private float gCost;
+    public float gCost;
     public float hCost;
-    public float fCost;
+    public float fCost {
+        get
+        {
+            return gCost + hCost;
+        }
+    }
 
-    public bool focused = false;
+    public Cell parent;
 
     public CellState cellState;
     public enum CellState
@@ -66,11 +71,11 @@ public class Cell
     {
         if(cellState != CellState.END && cellState != CellState.START)
             cell.GetComponent<SpriteRenderer>().color = Static.focusColor;
-        focused = true;
+        //focused = true;
 
-        gCost = Vector2.Distance(startCell, pos);
-        hCost = Vector2.Distance(endCell, pos);
-        fCost = gCost + hCost;
+        //gCost = Vector2.Distance(startCell, pos);
+        //hCost = Vector2.Distance(endCell, pos);
+        //fCost = gCost + hCost;
     }
 
     public void setWalked()
@@ -82,9 +87,14 @@ public class Cell
         cellState = CellState.WALKED;
     }
 
+    public void setPath()
+    {
+        cell.GetComponent<SpriteRenderer>().color = Static.pathColor;
+    }
+
     public void reset()
     {
-        focused = false;
+        //focused = false;
 
         if (cellState == CellState.WALL || cellState == CellState.END)
             return;

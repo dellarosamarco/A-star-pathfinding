@@ -13,12 +13,26 @@ public class PathFinding : MonoBehaviour
 
     public IEnumerator findPath(Cell[,] grid, Vector2Int gridSize, Vector2Int startCell, Vector2Int endCell)
     {
-        Cell currentCell = grid[startCell.x, startCell.y];
+        List<Cell> openList = new List<Cell>() { grid[startCell.x, startCell.y] };
+        List<Cell> closedList = new List<Cell>();
+
+        Cell currentCell = openList[0];
         Cell targetCell = grid[endCell.x, endCell.y];
-        List<Cell> focusedCells = new List<Cell>();
 
         while(currentCell != targetCell)
         {
+            currentCell = openList[0];
+            foreach(Cell cell in openList)
+            {
+                if(cell.fCost < currentCell.fCost || cell.fCost == currentCell.fCost && cell.hCost < currentCell.hCost)
+                {
+                    currentCell = cell;
+                }
+            }
+
+            openList.Remove(currentCell);
+            closedList.Add(currentCell);
+
             for (int x = -1 + currentCell.x; x < 2 + currentCell.x; x++)
             {
                 for (int y = -1 + currentCell.y; y < 2 + currentCell.y; y++)
@@ -28,47 +42,39 @@ public class PathFinding : MonoBehaviour
                         (x != currentCell.x || y != currentCell.y) &&
                         (x >= 0 && x < gridSize.x) &&
                         (y >= 0 && y < gridSize.y) &&
-                        (grid[x, y].cellState != Cell.CellState.WALKED) &&
-                        (grid[x, y].cellState != Cell.CellState.WALL) &&
-                        (grid[x, y].focused == false)
+                        (closedList.Contains(grid[x,y]) == false) &&
+                        (grid[x, y].cellState != Cell.CellState.WALL)
                        )
                     {
-                        grid[x, y].setFocus(startCell, endCell);
-                        focusedCells.Add(grid[x, y]);
+                        float newMovementCost = currentCell.gCost + Vector2.Distance(new Vector2(currentCell.x, currentCell.y), new Vector2(grid[x, y].x, grid[x, y].y));
+
+                        if(newMovementCost < grid[x,y].gCost || !openList.Contains(grid[x,y]))
+                        {
+                            grid[x, y].gCost = newMovementCost;
+                            grid[x, y].hCost = Vector2.Distance(new Vector2(grid[x, y].x, grid[x, y].y), endCell);
+                            grid[x, y].parent = currentCell;
+                            grid[x, y].setWalked();
+                            openList.Add(grid[x, y]);
+                        }
+                        
                     }
                 }
             }
 
-            Cell bestFocusedCell = focusedCells[0];
-            int priority = 3;
-            foreach (Cell cell in focusedCells)
-            {
-                if(cell.fCost < bestFocusedCell.fCost && cell.hCost < bestFocusedCell.hCost && priority >= 0)
-                {
-                    bestFocusedCell = cell;
-                    priority = 0;
-                }
-                else if (cell.fCost < bestFocusedCell.fCost && priority >= 1)
-                {
-                    bestFocusedCell = cell;
-                    priority = 1;
-                }
-                else if(cell.fCost == bestFocusedCell.fCost && cell.hCost < bestFocusedCell.hCost && priority >= 2)
-                {
-                    bestFocusedCell = cell;
-                    priority = 2;
-                }
-                else if(cell.fCost == bestFocusedCell.fCost && priority >= 3)
-                {
-                    bestFocusedCell = cell;
-                    priority = 3;
-                }
-            }
-            focusedCells.Remove(bestFocusedCell);
-            currentCell = bestFocusedCell;
+            yield return null;
+        }
 
-            bestFocusedCell.setWalked();
+        StartCoroutine(drawPath(grid[startCell.x, startCell.y], grid[endCell.x, endCell.y]));
+    }
 
+    public IEnumerator drawPath(Cell startCell, Cell endCell)
+    {
+        Cell currentCell = endCell;
+
+        while (currentCell != startCell)
+        {
+            currentCell = currentCell.parent;
+            currentCell.parent.setPath();
             yield return null;
         }
     }
