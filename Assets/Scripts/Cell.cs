@@ -15,7 +15,7 @@ public class Cell
         }
     }
 
-    public Cell parent;
+    public Cell parent = null;
 
     public CellState cellState;
     public enum CellState
@@ -71,11 +71,6 @@ public class Cell
     {
         if(cellState != CellState.END && cellState != CellState.START)
             cell.GetComponent<SpriteRenderer>().color = Static.focusColor;
-        //focused = true;
-
-        //gCost = Vector2.Distance(startCell, pos);
-        //hCost = Vector2.Distance(endCell, pos);
-        //fCost = gCost + hCost;
     }
 
     public void setWalked()
@@ -94,8 +89,6 @@ public class Cell
 
     public void reset()
     {
-        //focused = false;
-
         if (cellState == CellState.WALL || cellState == CellState.END)
             return;
 

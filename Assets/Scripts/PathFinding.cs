@@ -71,10 +71,10 @@ public class PathFinding : MonoBehaviour
     {
         Cell currentCell = endCell;
 
-        while (currentCell != startCell)
+        while (currentCell != startCell && currentCell.parent != null)
         {
             currentCell = currentCell.parent;
-            currentCell.parent.setPath();
+            currentCell.setPath();
             yield return null;
         }
     }
