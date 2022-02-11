@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,14 +21,17 @@ public class Grid : MonoBehaviour
 
     private bool searchingPath = false;
 
+    private Coroutine pathfindingRouting = null;
+
     private void Start()
     {
+        //Set camera position
         cameraTransform.position = new Vector3(gridSize.x / 2, gridSize.y / 2, -10);
         cameraTransform.gameObject.GetComponent<Camera>().orthographicSize = gridSize.x / 1.666f;
 
+        //Create grid
         grid = new Cell[gridSize.x, gridSize.y];
 
-        //Create grid
         for (int x = 0; x < gridSize.x; x++)
         {
             for (int y = 0; y < gridSize.y; y++)
@@ -40,7 +42,7 @@ public class Grid : MonoBehaviour
             }
         }
 
-        //Set starting point
+        //Set target cell
         endCellIndex = new Vector2Int(Random.Range(0, gridSize.x), Random.Range(0, gridSize.y));
         grid[endCellIndex.x, endCellIndex.y].setEnd();
     }
@@ -66,6 +68,10 @@ public class Grid : MonoBehaviour
         {
             if (searchingPath)
             {
+                //Stop previous path finding
+                StopCoroutine(pathfindingRouting);
+
+                //Reset all cells
                 foreach(Cell cell in cells)
                 {
                     cell.reset();
@@ -74,18 +80,25 @@ public class Grid : MonoBehaviour
 
             searchingPath = true;
 
+            //Get mouse position
             Vector2 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             int x = (int)(worldPosition.x + 0.5f);
             int y = (int)(worldPosition.y + 0.5f);
 
-            if (x < 0 || y < 0 || x >= gridSize.x || y >= gridSize.y || 
-                grid[x, y].cellState == Cell.CellState.END)
+            //Check mouse position
+            if (x < 0 || y < 0 || x >= gridSize.x || y >= gridSize.y || grid[x, y].cellState == Cell.CellState.END)
                 return;
 
+            //Set starting cell
             grid[x, y].setStart();
             startCellIndex = new Vector2Int(x, y);
 
-            StartCoroutine(PathFinding.instance.findPath(grid, gridSize, startCellIndex, endCellIndex));
+            //Start path finding
+            pathfindingRouting = StartCoroutine(PathFinding.instance.findPath(grid, gridSize, startCellIndex, endCellIndex));
+        }
+        else if (Input.GetMouseButtonDown(2))
+        {
+            StartCoroutine(MazeGenerator.instance.generateMaze(gridSize, grid));
         }
     }
 }

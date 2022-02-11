@@ -24,7 +24,8 @@ public class Cell
         START,
         END,
         WALL,
-        WALKED
+        WALKED,
+        PATH
     }
 
     public Cell(int x, int y, GameObject cell)
@@ -84,7 +85,11 @@ public class Cell
 
     public void setPath()
     {
+        if (cellState == CellState.END || cellState == CellState.START)
+            return;
+
         cell.GetComponent<SpriteRenderer>().color = Static.pathColor;
+        cellState = CellState.PATH;
     }
 
     public void reset()
