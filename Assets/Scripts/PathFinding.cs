@@ -11,7 +11,13 @@ public class PathFinding : MonoBehaviour
         instance = this;
     }
 
-    public IEnumerator findPath(Cell[,] grid, Vector2Int gridSize, Vector2Int startCell, Vector2Int endCell)
+    public IEnumerator findPath(
+        Cell[,] grid, 
+        Vector2Int gridSize, 
+        Vector2Int startCell, 
+        Vector2Int endCell,
+        bool allowDiagonalMovement = true
+    )
     {
         List<Cell> openList = new List<Cell>() { grid[startCell.x, startCell.y] };
         List<Cell> closedList = new List<Cell>();
@@ -38,8 +44,8 @@ public class PathFinding : MonoBehaviour
                 for (int y = -1 + currentCell.y; y < 2 + currentCell.y; y++)
                 {
                     if (
-                        //(x == currentCell.x || y == currentCell.y) &&
-                        //(x != currentCell.x || y != currentCell.y) &&
+                        (!allowDiagonalMovement ? x == currentCell.x || y == currentCell.y : true) &&
+                        (!allowDiagonalMovement ? x != currentCell.x || y != currentCell.y : true) &&
                         (x >= 0 && x < gridSize.x) &&
                         (y >= 0 && y < gridSize.y) &&
                         (closedList.Contains(grid[x,y]) == false) &&

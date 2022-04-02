@@ -6,11 +6,12 @@ public class Grid : MonoBehaviour
     [Header("Grid settings")]
     public Vector2Int gridSize;
 
-    [Header("Cell settings")]
-    public GameObject cellObject;
+    [Header("Settings")]
+    public bool allowDiagonalMovement = true;
 
     [Header("Components")]
     public Transform cameraTransform;
+    public GameObject cellObject;
 
     private List<Cell> cells = new List<Cell>();
     private Cell[,] grid;
@@ -96,7 +97,15 @@ public class Grid : MonoBehaviour
             startCellIndex = new Vector2Int(x, y);
 
             //Start path finding
-            pathfindingRoutine = StartCoroutine(PathFinding.instance.findPath(grid, gridSize, startCellIndex, endCellIndex));
+            pathfindingRoutine = StartCoroutine(
+                PathFinding.instance.findPath(
+                    grid, 
+                    gridSize, 
+                    startCellIndex, 
+                    endCellIndex,
+                    allowDiagonalMovement : allowDiagonalMovement
+                )
+            );
         }
         else if (Input.GetMouseButtonDown(2)) 
         {
@@ -110,6 +119,5 @@ public class Grid : MonoBehaviour
         {
             cell.reset(totalReset);
         }
-
     }
 }

@@ -94,7 +94,7 @@ public class Cell
 
     public void reset(bool totalReset=false)
     {
-        if (!totalReset && (cellState == CellState.WALL || cellState == CellState.END))
+        if ((!totalReset && (cellState == CellState.WALL)) || cellState == CellState.END)
             return;
 
         cellState = CellState.EMPTY;

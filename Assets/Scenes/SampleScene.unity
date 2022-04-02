@@ -237,8 +237,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridSize: {x: 25, y: 25}
-  cellObject: {fileID: 9049151364155328230, guid: 58815a32767b27d44b89c89914d7a799, type: 3}
+  allowDiagonalMovement: 0
   cameraTransform: {fileID: 519420032}
+  cellObject: {fileID: 9049151364155328230, guid: 58815a32767b27d44b89c89914d7a799, type: 3}
 --- !u!4 &1421611806
 Transform:
   m_ObjectHideFlags: 0
