@@ -92,9 +92,9 @@ public class Cell
         cellState = CellState.PATH;
     }
 
-    public void reset()
+    public void reset(bool totalReset=false)
     {
-        if (cellState == CellState.WALL || cellState == CellState.END)
+        if (!totalReset && (cellState == CellState.WALL || cellState == CellState.END))
             return;
 
         cellState = CellState.EMPTY;

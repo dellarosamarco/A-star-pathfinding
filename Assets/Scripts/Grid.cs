@@ -21,7 +21,7 @@ public class Grid : MonoBehaviour
 
     private bool searchingPath = false;
 
-    private Coroutine pathfindingRouting = null;
+    private Coroutine pathfindingRoutine = null;
 
     private void Start()
     {
@@ -56,10 +56,10 @@ public class Grid : MonoBehaviour
             int y = (int)(worldPosition.y + 0.5f);
 
             if (x < 0 || y < 0 || x >= gridSize.x || y >= gridSize.y ||
-                grid[x,y].cellState == Cell.CellState.START ||grid[x, y].cellState == Cell.CellState.END)
+                grid[x, y].cellState == Cell.CellState.START || grid[x, y].cellState == Cell.CellState.END)
                 return;
 
-            if(grid[x, y].setWall())
+            if (grid[x, y].setWall())
             {
                 wallsIndex.Add(new Vector2Int(x, y));
             }
@@ -69,13 +69,9 @@ public class Grid : MonoBehaviour
             if (searchingPath)
             {
                 //Stop previous path finding
-                StopCoroutine(pathfindingRouting);
+                StopCoroutine(pathfindingRoutine);
 
-                //Reset all cells
-                foreach(Cell cell in cells)
-                {
-                    cell.reset();
-                }
+                resetCells();
             }
 
             searchingPath = true;
@@ -100,7 +96,20 @@ public class Grid : MonoBehaviour
             startCellIndex = new Vector2Int(x, y);
 
             //Start path finding
-            pathfindingRouting = StartCoroutine(PathFinding.instance.findPath(grid, gridSize, startCellIndex, endCellIndex));
+            pathfindingRoutine = StartCoroutine(PathFinding.instance.findPath(grid, gridSize, startCellIndex, endCellIndex));
         }
+        else if (Input.GetMouseButtonDown(2)) 
+        {
+            resetCells(true);
+        }
+    }
+
+    void resetCells(bool totalReset=false)
+    {
+        foreach (Cell cell in cells)
+        {
+            cell.reset(totalReset);
+        }
+
     }
 }
