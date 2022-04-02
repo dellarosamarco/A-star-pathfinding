@@ -89,16 +89,18 @@ public class Grid : MonoBehaviour
             if (x < 0 || y < 0 || x >= gridSize.x || y >= gridSize.y || grid[x, y].cellState == Cell.CellState.END)
                 return;
 
+            for (int i = 0; i < wallsIndex.Count; i++)
+            {
+                if (wallsIndex[i].x == x && wallsIndex[i].y == y)
+                    return;
+            }
+
             //Set starting cell
             grid[x, y].setStart();
             startCellIndex = new Vector2Int(x, y);
 
             //Start path finding
             pathfindingRouting = StartCoroutine(PathFinding.instance.findPath(grid, gridSize, startCellIndex, endCellIndex));
-        }
-        else if (Input.GetMouseButtonDown(2))
-        {
-            StartCoroutine(MazeGenerator.instance.generateMaze(gridSize, grid));
         }
     }
 }
